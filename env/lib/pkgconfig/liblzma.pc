@@ -1,0 +1,19 @@
+#
+# Author: Lasse Collin
+#
+# This file has been put into the public domain.
+# You can do whatever you want with this file.
+#
+
+prefix=/Users/karndeepsingh/Documents/mlops/MLflow-Class_1/env
+exec_prefix=/Users/karndeepsingh/Documents/mlops/MLflow-Class_1/env
+libdir=/Users/karndeepsingh/Documents/mlops/MLflow-Class_1/env/lib
+includedir=/Users/karndeepsingh/Documents/mlops/MLflow-Class_1/env/include
+
+Name: liblzma
+Description: General purpose data compression library
+URL: https://tukaani.org/xz/
+Version: 5.2.5
+Cflags: -I${includedir}
+Libs: -L${libdir} -llzma
+Libs.private: -pthread -lpthread

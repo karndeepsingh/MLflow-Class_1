@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/karndeepsingh/Documents/mlops/MLflow-Class_1/mlruns/0/e2831574a4b0489ebacccfb0962d1d15/artifacts
+end_time: 1662140584697
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: e2831574a4b0489ebacccfb0962d1d15
+run_uuid: e2831574a4b0489ebacccfb0962d1d15
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1662140584689
+status: 3
+tags: []
+user_id: karndeepsingh
