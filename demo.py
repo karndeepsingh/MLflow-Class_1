@@ -2,28 +2,63 @@ import os
 import mlflow
 import argparse
 import time
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import ElasticNet
+import numpy as np
+import pandas as pd 
 
-def evaluate(param1, param2):
-    metric = param1 ** 2 + param2 ** 2
-    return metric
+def evaluate(actual, pred):
+    rmse = np.sqrt(mean_squared_error(actual,pred))
+    mae = mean_absolute_error(actual,pred)
+    r2 = r2_score(actual,pred)
+    return rmse, mae, r2
 
-def main(p1,p2):
+def get_data():
+    url ="https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv" 
+    try:
+        df = pd.read_csv(url,sep=";")
+        return df
+    except Exception as e:
+        raise e     
+
+def main(alpha,l1_ratio):
+    df = get_data()
+    train, test = train_test_split(df)
+    TARGET ="quality"
+    train_x = train.drop([TARGET],axis=1)
+    test_x = test.drop([TARGET],axis=1)
+
+    train_y = train[TARGET]
+    test_y = test[TARGET]
+
     with mlflow.start_run():
-        mlflow.log_param("param1",p1)
-        mlflow.log_param("param2",p2)
-        metric = evaluate(param1=p1,param2=p2)
-        mlflow.log_metric("metric",metric)
+        mlflow.log_param("alpha",alpha)
+        mlflow.log_param("l1_ratio", l1_ratio)
 
-        os.makedirs("temp",exist_ok=True)
-        with open("temp/sample.txt","w") as f:
-            f.write(time.asctime())
-        mlflow.log_artifacts("temp")    
+
+
+
+        model = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
+        model.fit(train_x,train_y)
+        pred = model.predict(test_x)
+
+        rmse, mae,r2 = evaluate(test_y, pred) 
+
+        mlflow.log_metric("rmse",rmse)
+        mlflow.log_metric("mae",mae)
+        mlflow.log_metric("r2",r2)
+        print(f"params -alpha: {alpha}, l1_ratio: {l1_ratio}")
+        print(f"Metrics- Rmse: {rmse}, Mae: {mae}, r2_Score : {r2}")
+
+        mlflow.sklearn.log_model(model,"model") 
 if __name__ == '__main__':
     args = argparse.ArgumentParser()
-    args.add_argument("--param1","-p1",type=int,default=2)
-    args.add_argument("--param2","-p2",type=int,default=2)
+    args.add_argument("--alpha","-a",type=int,default=0.5)
+    args.add_argument("--l1_ratio","-l1",type=int,default=0.5)
+
     parsed_args = args.parse_args()
 
-    main(parsed_args.param1, parsed_args.param2)
+    main(parsed_args.alpha, parsed_args.l1_ratio)
 
 
